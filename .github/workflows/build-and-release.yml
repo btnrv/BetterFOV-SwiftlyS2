@@ -57,6 +57,9 @@ jobs:
         id: zip
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="v${{ steps.version.outputs.version }}"
+          fi
 
           rm -rf release-artifacts
           mkdir -p release-artifacts
