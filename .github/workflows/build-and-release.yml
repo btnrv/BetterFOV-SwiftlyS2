@@ -2,6 +2,8 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -11,7 +13,6 @@ concurrency:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
 
     permissions:
       contents: write
@@ -26,7 +27,7 @@ jobs:
       - name: Extract version from PluginMetadata
         id: version
         run: |
-          VERSION=$(grep -roh 'Version *= *"[^"]*"' --include="*.cs" BetterFOV/ | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          VERSION=$(grep -roh 'Version *= *"[^"]*"' --include="*.cs" src/ | head -1 | sed 's/.*"\(.*\)".*/\1/')
 
           if [ -z "$VERSION" ]; then
             echo "::error::Could not find PluginMetadata Version"
@@ -43,25 +44,24 @@ jobs:
 
       - name: Build Cookies.Contract
         run: |
-          cd BetterFOV/deps/Cookies/Cookies.Contract
+          cd deps/Cookies/Cookies.Contract
           dotnet restore
           dotnet build -c Release
 
       - name: Build and Publish BetterFOV
         run: |
-          cd BetterFOV
           dotnet restore
           dotnet publish -c Release
 
       - name: Prepare release artifacts
         id: zip
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
+          TAG="${{ steps.tag.outputs.tag }}"
 
           rm -rf release-artifacts
           mkdir -p release-artifacts
 
-          PUBLISH_DIR="./BetterFOV/build/publish/BetterFOV"
+          PUBLISH_DIR="./build/publish/BetterFOV"
           if [ ! -d "$PUBLISH_DIR" ]; then
             echo "::error::BetterFOV publish directory not found: $PUBLISH_DIR"
             exit 1
@@ -70,43 +70,47 @@ jobs:
           echo "=== Staged BetterFOV contents ==="
           find "$PUBLISH_DIR" -type f | head -30
 
-          (cd ./BetterFOV/build/publish && zip -r "../../../release-artifacts/BetterFOV-v${VERSION}.zip" "BetterFOV" > /dev/null)
+          (cd ./build/publish && zip -r "../../release-artifacts/BetterFOV-${TAG}.zip" "BetterFOV" > /dev/null)
 
-          echo "plugin_zip=release-artifacts/BetterFOV-v${VERSION}.zip" >> $GITHUB_OUTPUT
+          echo "plugin_zip=release-artifacts/BetterFOV-${TAG}.zip" >> $GITHUB_OUTPUT
 
       - name: Determine release tag
         id: tag
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           REPO_NAME="${{ github.event.repository.name }}"
+          LATEST_TAG="$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || true)"
 
-          BASE_TAG="v${VERSION}"
-          TAG="$BASE_TAG"
-          TITLE="${REPO_NAME} | ${BASE_TAG}"
-          BUILD_NUM=1
+          if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" = "null" ]; then
+            TAG="v1.0.0"
+          else
+            NUMERIC="$(echo "$LATEST_TAG" | sed -n 's/^v\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)$/\1 \2 \3/p')"
+            if [ -z "$NUMERIC" ]; then
+              echo "::warning::Latest release tag '$LATEST_TAG' is not semver; resetting to v1.0.0"
+              TAG="v1.0.0"
+            else
+              MAJOR="$(echo "$NUMERIC" | awk '{print $1}')"
+              MINOR="$(echo "$NUMERIC" | awk '{print $2}')"
+              PATCH="$(echo "$NUMERIC" | awk '{print $3}')"
+              TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+            fi
+          fi
 
-          while gh release view "$TAG" &>/dev/null; do
-            BUILD_NUM=$((BUILD_NUM + 1))
-            TAG="${BASE_TAG}-${BUILD_NUM}"
-            TITLE="${REPO_NAME} | ${BASE_TAG}#${BUILD_NUM}"
-            echo "Tag $BASE_TAG exists, trying: $TAG"
-          done
+          TITLE="${REPO_NAME} | ${TAG}"
 
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "title=$TITLE" >> $GITHUB_OUTPUT
-          echo "Determined tag: $TAG (Title: $TITLE)"
+          echo "Determined tag: $TAG"
 
       - name: Extract changelog
         id: changelog
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           NEW_TAG="${{ steps.tag.outputs.tag }}"
           CHANGELOG=""
 
           if [ -f "CHANGELOG.md" ]; then
-            CHANGELOG=$(awk -v ver="$VERSION" '
+            CHANGELOG=$(awk -v ver="${NEW_TAG#v}" '
               /^## \[/ {
                 if (found) exit
                 if ($0 ~ "\\[v?" ver "\\]") { found=1; next }
@@ -116,7 +120,7 @@ jobs:
           fi
 
           if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="Release v$VERSION"
+            CHANGELOG="Release ${NEW_TAG}"
           fi
 
           PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -135,12 +139,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           TAG="${{ steps.tag.outputs.tag }}"
           TITLE="${{ steps.tag.outputs.title }}"
 
           PRERELEASE_FLAG=""
-          if [[ "$VERSION" == *-* ]]; then
+          if [[ "$TAG" == *-* ]]; then
             PRERELEASE_FLAG="--prerelease"
             echo "Detected pre-release version"
           fi
