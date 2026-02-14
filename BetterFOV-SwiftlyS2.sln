@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterFOV", "BetterFOV.csproj", "{8610406E-0902-3164-734A-39D8D5421D70}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deps", "deps", "{EFB4CC41-4662-2886-C5B9-2E8AD88A9DBC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cookies", "Cookies", "{1ABA9970-B0A7-DDE7-0308-C5BF8CD906BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookies.Contract", "deps\Cookies\Cookies.Contract\Cookies.Contract.csproj", "{DEFE608C-BCF7-2946-F456-0FD0034F3FD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookies", "deps\Cookies\Cookies\Cookies.csproj", "{05053652-E6A8-27C5-EB58-203348DF3EF6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8610406E-0902-3164-734A-39D8D5421D70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8610406E-0902-3164-734A-39D8D5421D70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8610406E-0902-3164-734A-39D8D5421D70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8610406E-0902-3164-734A-39D8D5421D70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEFE608C-BCF7-2946-F456-0FD0034F3FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEFE608C-BCF7-2946-F456-0FD0034F3FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEFE608C-BCF7-2946-F456-0FD0034F3FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEFE608C-BCF7-2946-F456-0FD0034F3FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05053652-E6A8-27C5-EB58-203348DF3EF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05053652-E6A8-27C5-EB58-203348DF3EF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05053652-E6A8-27C5-EB58-203348DF3EF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05053652-E6A8-27C5-EB58-203348DF3EF6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1ABA9970-B0A7-DDE7-0308-C5BF8CD906BA} = {EFB4CC41-4662-2886-C5B9-2E8AD88A9DBC}
+		{DEFE608C-BCF7-2946-F456-0FD0034F3FD0} = {1ABA9970-B0A7-DDE7-0308-C5BF8CD906BA}
+		{05053652-E6A8-27C5-EB58-203348DF3EF6} = {1ABA9970-B0A7-DDE7-0308-C5BF8CD906BA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CE7A04F9-DBB3-4FFB-94F8-06F71E38688C}
+	EndGlobalSection
+EndGlobal

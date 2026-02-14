@@ -1,0 +1,8 @@
+{
+  "betterfov.chat.disabled": "The FOV manager is currently disabled.",
+  "betterfov.chat.reset_success": "Your field of view has been reset to {0}.",
+  "betterfov.chat.invalid_value": "Please enter a valid numeric FOV value.",
+  "betterfov.chat.usage": "Usage: !{0} <value>",
+  "betterfov.chat.out_of_range": "Please choose a value between {0} and {1}.",
+  "betterfov.chat.set_success": "Your field of view is now set to {0}."
+}

@@ -1,0 +1,8 @@
+{
+  "betterfov.chat.disabled": "FOV şu anda devre dışı.",
+  "betterfov.chat.reset_success": "Görüş açısı {0} değerine sıfırlandı.",
+  "betterfov.chat.invalid_value": "Lütfen geçerli bir FOV değeri girin.",
+  "betterfov.chat.usage": "Kullanım: !{0} <değer>",
+  "betterfov.chat.out_of_range": "Lütfen {0} ile {1} arasında bir değer girin.",
+  "betterfov.chat.set_success": "Görüş açınız {0} olarak ayarlandı."
+}
