@@ -1,3 +1,3 @@
-[submodule "BetterFOV/deps/Cookies"]
-	path = BetterFOV/deps/Cookies
+[submodule "deps/Cookies"]
+	path = deps/Cookies
 	url = https://github.com/SwiftlyS2-Plugins/Cookies.git
