@@ -50,8 +50,8 @@ jobs:
 
       - name: Build and Publish BetterFOV
         run: |
-          dotnet restore
-          dotnet publish -c Release
+          dotnet restore BetterFOV.csproj
+          dotnet publish BetterFOV.csproj -c Release
 
       - name: Prepare release artifacts
         id: zip
