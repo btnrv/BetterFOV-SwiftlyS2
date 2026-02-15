@@ -6,10 +6,18 @@ namespace BetterFOV;
 internal sealed class FOVPreferenceService
 {
     private readonly Dictionary<int, int> fovByPlayerId = [];
+    private readonly Dictionary<long, int> pendingFovBySteamId = [];
 
     public void Load(IPlayer player, FOVPluginConfig config, IPlayerCookiesAPIv1? cookiesApi)
     {
         var fov = config.DefaultFOV;
+        var steamId = (long)player.SteamID;
+
+        if (pendingFovBySteamId.TryGetValue(steamId, out var pendingFov))
+        {
+            fovByPlayerId[player.PlayerID] = Clamp(pendingFov, config);
+            return;
+        }
 
         if (cookiesApi is not null)
         {
@@ -38,14 +46,42 @@ internal sealed class FOVPreferenceService
     {
         var clampedFOV = Clamp(value, config);
         fovByPlayerId[player.PlayerID] = clampedFOV;
+        var steamId = (long)player.SteamID;
 
-        if (cookiesApi is not null)
+        if (cookiesApi is null)
         {
-            cookiesApi.Set(player, config.CookieKey, clampedFOV);
-            cookiesApi.Save(player);
+            return clampedFOV;
         }
 
+        if (!config.EnableCookiesCaching)
+        {
+            pendingFovBySteamId.Remove(steamId);
+            cookiesApi.Set(player, config.CookieKey, clampedFOV);
+            cookiesApi.Save(player);
+            return clampedFOV;
+        }
+
+        pendingFovBySteamId[steamId] = clampedFOV;
+
         return clampedFOV;
+    }
+
+    public int FlushPending(FOVPluginConfig config, IPlayerCookiesAPIv1? cookiesApi)
+    {
+        if (cookiesApi is null || pendingFovBySteamId.Count == 0)
+        {
+            return 0;
+        }
+
+        var flushedCount = 0;
+        foreach (var (steamId, fov) in pendingFovBySteamId.ToArray())
+        {
+            cookiesApi.Set(steamId, config.CookieKey, fov);
+            pendingFovBySteamId.Remove(steamId);
+            flushedCount++;
+        }
+
+        return flushedCount;
     }
 
     public void Remove(int playerId)
@@ -56,6 +92,7 @@ internal sealed class FOVPreferenceService
     public void Clear()
     {
         fovByPlayerId.Clear();
+        pendingFovBySteamId.Clear();
     }
 
     private static int Clamp(int value, FOVPluginConfig config)

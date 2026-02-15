@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared.Events;
 using SwiftlyS2.Shared.GameEventDefinitions;
 using SwiftlyS2.Shared.GameEvents;
@@ -24,6 +25,13 @@ public sealed partial class BetterFOV
         var fov = fovPreferences.GetOrLoad(player!, config, playerCookiesApi);
         FOVApplier.TryApply(player!, fov);
 
+        return HookResult.Continue;
+    }
+
+    [GameEventHandler(HookMode.Post)]
+    public HookResult OnRoundEnd(EventRoundEnd @event)
+    {
+        FlushPendingPreferences("round_end");
         return HookResult.Continue;
     }
 
@@ -75,6 +83,15 @@ public sealed partial class BetterFOV
             }
 
             fovPreferences.Load(player, config, playerCookiesApi);
+        }
+    }
+
+    private void FlushPendingPreferences(string reason)
+    {
+        var flushedCount = fovPreferences.FlushPending(config, playerCookiesApi);
+        if (flushedCount > 0)
+        {
+            Core.Logger.LogDebug("[BetterFOV] Flushed {FlushedCount} pending FOV preference(s) to Cookies on {Reason}.", flushedCount, reason);
         }
     }
 }

@@ -13,7 +13,7 @@
 
 ## Installation
 
-1. Install the [Cookies plugin](https://github.com/SwiftlyS2-Plugins/Cookies) (required dependency)
+1. Install the [Cookies plugin](https://github.com/SwiftlyS2-Plugins/Cookies)
 2. Extract the BetterFOV.zip to your SwiftlyS2 plugins directory
 3. Configure the plugin in `configs/plugins/BetterFOV/config.jsonc`
 4. Restart your server
@@ -26,6 +26,7 @@ Edit `configs/plugins/BetterFOV/config.jsonc`:
 {
   "BetterFOV": {
     "Enabled": true,
+    "EnableCookiesCaching": true,
     "Prefix": "[red][BetterFOV][default] ",
     "MinFOV": 80,
     "MaxFOV": 130,
@@ -35,6 +36,9 @@ Edit `configs/plugins/BetterFOV/config.jsonc`:
   }
 }
 ```
+
+- `EnableCookiesCaching: true` queues FOV cookie writes and flushes them on round end.
+- `EnableCookiesCaching: false` saves to Cookies immediately when command is used.
 
 ## Usage
 

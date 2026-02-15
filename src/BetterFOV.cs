@@ -36,6 +36,7 @@ public sealed partial class BetterFOV : BasePlugin
 
     public override void Unload()
     {
+        fovPreferences.FlushPending(config, playerCookiesApi);
         UnsubscribeCoreEvents();
         UnregisterCommands();
         fovPreferences.Clear();

@@ -3,6 +3,7 @@ namespace BetterFOV;
 public sealed class FOVPluginConfig
 {
     public bool Enabled { get; set; } = true;
+    public bool EnableCookiesCaching { get; set; } = true;
     public string Prefix { get; set; } = "[gold][BetterFOV][default] ";
     public int MinFOV { get; set; } = 80;
     public int MaxFOV { get; set; } = 130;
